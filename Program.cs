@@ -241,9 +241,21 @@ namespace efiboot
 
             reboot = str.EndsWith("!");
             str = str.TrimEnd('!');
-            if (int.TryParse(str, out var idx) && idx < res.Length)
-                bootNext = res[idx];
-            else
+            if (int.TryParse(str, out var idx))
+            {
+                // item.Id does not necessary match the res index!
+                // also it is better to keep using item.Id so the behavior is consistent with efibootmgr's
+                for (int i = 0; i < res.Length; i++)
+                {
+                    if (res[i].Id == idx)
+                    {
+                        bootNext = res[i];
+                        break;
+                    }
+                }
+            }
+
+            if (bootNext == null)
                 bootNext = res.FirstOrDefault(x => x.Description == str);
 
             if (bootNext != null)
